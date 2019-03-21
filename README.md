@@ -1,12 +1,8 @@
-# Spring框架学习笔记
+# Spring 学习笔记
 
 * [IOC 和 DI 的概述](#ioc-%E5%92%8C-di-%E7%9A%84%E6%A6%82%E8%BF%B0)
   * [IOC(Inversion of Controll)](#iocinversion-of-controll)
   * [DI(Dependency Injection)](#didependency-injection)
-  * [IOC的前身](#ioc%E7%9A%84%E5%89%8D%E8%BA%AB)
-    * [分离接口与实现](#%E5%88%86%E7%A6%BB%E6%8E%A5%E5%8F%A3%E4%B8%8E%E5%AE%9E%E7%8E%B0)
-    * [采用工厂设计模式](#%E9%87%87%E7%94%A8%E5%B7%A5%E5%8E%82%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F)
-    * [采用反转控制](#%E9%87%87%E7%94%A8%E5%8F%8D%E8%BD%AC%E6%8E%A7%E5%88%B6)
 * [Spring配置](#spring%E9%85%8D%E7%BD%AE)
   * [ApplicationContext](#applicationcontext)
   * [Bean的相关配置](#bean%E7%9A%84%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE)
@@ -68,6 +64,18 @@
         * [查询返回单个对象](#%E6%9F%A5%E8%AF%A2%E8%BF%94%E5%9B%9E%E5%8D%95%E4%B8%AA%E5%AF%B9%E8%B1%A1)
         * [查询返回对象集合](#%E6%9F%A5%E8%AF%A2%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E9%9B%86%E5%90%88)
 * [Spring事务管理](#spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)
+  * [什么是事务](#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%8B%E5%8A%A1)
+  * [事务的特性](#%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%89%B9%E6%80%A7)
+  * [不考虑隔离性引发的安全性问题](#%E4%B8%8D%E8%80%83%E8%99%91%E9%9A%94%E7%A6%BB%E6%80%A7%E5%BC%95%E5%8F%91%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E9%97%AE%E9%A2%98)
+  * [解决读问题](#%E8%A7%A3%E5%86%B3%E8%AF%BB%E9%97%AE%E9%A2%98)
+  * [Spring事务管理API](#spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86api)
+  * [Spring事务的传播行为](#spring%E4%BA%8B%E5%8A%A1%E7%9A%84%E4%BC%A0%E6%92%AD%E8%A1%8C%E4%B8%BA)
+  * [Spring事务管理案例——转账情景](#spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E6%A1%88%E4%BE%8B%E8%BD%AC%E8%B4%A6%E6%83%85%E6%99%AF)
+    * [转账情景实现](#%E8%BD%AC%E8%B4%A6%E6%83%85%E6%99%AF%E5%AE%9E%E7%8E%B0)
+    * [编程式事务](#%E7%BC%96%E7%A8%8B%E5%BC%8F%E4%BA%8B%E5%8A%A1)
+    * [声明式事务](#%E5%A3%B0%E6%98%8E%E5%BC%8F%E4%BA%8B%E5%8A%A1)
+      * [XML配置方式](#xml%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F)
+      * [注解配置方式](#%E6%B3%A8%E8%A7%A3%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F)
 
 # IOC 和 DI 的概述
 
@@ -80,14 +88,6 @@
 是IOC的另一种表述方式，即**组件以一些预先定义好的方式(如：getter方法)来接收来自容器的资源注入**
 
 <!-- more -->
-
-## IOC的前身
-
-### 分离接口与实现
-
-### 采用工厂设计模式
-
-### 采用反转控制
 
 # Spring配置
 
@@ -2761,5 +2761,626 @@ public void test10(){
 
 # Spring事务管理
 
+## 什么是事务
+
+事务：逻辑上的一组操作，组成这组操作的各个单元，要么全部成功，要么全部失败。
+
+## 事务的特性
+
++ 原子性：事务不可分割
++ 一致性：事务执行前后数据完整性保持一致
++ 隔离性：一个事务的执行不应该受到其他事务的干扰
++ 持久性：一旦事务结束，数据就持久化到数据库
+
+## 不考虑隔离性引发的安全性问题
+
++ 读问题
+  + 脏读：A事务读到B事务未提交的数据
+  + 不可重复读：B事务在A事务两次读取数据之间，修改了数据，导致A事务两次读取结果不一致
+  + 幻读/虚读：B事务在A事务批量修改数据时，插入了一条新的数据，导致数据库中仍有一条数据未被修改。
++ 写问题
+  + 丢失更新：
+
+## 解决读问题
+
++ 设置事务的隔离级别
+  + `Read uncommitted`：未提交读，任何读问题都解决不了
+  + `Read committed`：已提交读，解决脏读，但是不可重复读和幻读有可能发生
+  + `Repeatable read`：重复读，解决脏读和不可重复读，但是幻读有可能发生
+  + `Serializable`：解决所有读问题，因为禁止并行执行
+
+## Spring事务管理API
+
++ `PlatformTransactionManager`：平台事务管理器
+
+  + `DataSourceTransactionManager`：底层使用JDBC管理事务
+
++ `TransactionDefinition`：事务定义信息
+
+  ​	用于定义事务相关的信息，隔离级别，超时信息，传播行为，是否只读……
+
++ `TransactionStatus`：事务的状态
+
+  ​	用于记录在事务管理过程中，事务的状态
+
+API的关系：
+
+Spring在进行事务管理的时候，首先**平台事务管理器**根据**事务定义信息**进行事务的管理，在事务管理过程中，产生各种状态，将这些状态信息记录到**事务状态对象**
+
+## Spring事务的传播行为
+
+首先假设一个背景，Service1里的x()方法已经定义了一个事务，Service2里的y()方法也有一个事务，但现在新增一行代码在Service2的y()方法中要先调用Service1里的x()方法然后再执行本身的方法。这时就涉及到**事务的传播行为**。
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321110709.png)
+
+Spring中提供了7种传播行为
+
+**假设x()方法称为A，y()方法称为B**
+
++ 保证多个操作在同一个事务中
+  + **`PROPAGATION_REQUIRED`**(\*)：Spring事务隔离级别的默认值。如果A中有事务，则使用A中的事务。如果没有，则创建一个新的事务，将操作包含进来。
+  + `PROPAGATION_SUPPORTS`：支持事务。如果A中有事务，使用A中的事务。如果A没有事务，则不使用事务。
+  + `PROPAGATION_MANDATORY`：如果A中有事务，使用A中的事务。如果没有事务，则抛出异常。
++ 保证多个事务不在同一个事务中
+  + **`PROPAGATION_REQUIRES_NEW`**(\*)：如果A中有事务，将A的事务挂起，创建新事务，只包含自身操作。如果A中没有事务，创建一个新事物，包含自身操作。
+  + `PROPAGATION_NOT_SUPPORTED`：如果A中有事务，将A的事务挂起，不使用事务。
+  + `PROPAGATION_NEVER`：如果A中有事务，则抛出异常。
++ 嵌套式事务
+  + **`PROPAGATION_NESTED`**(\*)：嵌套事务，如果A中有事务，则按照A的事务执行，执行完成后，设置一个保存点，再执行B中的操作，如果无异常，则执行通过，如果有异常，则可以选择回滚到初始位置或者保存点。
+
+## Spring事务管理案例——转账情景
+
+### 转账情景实现
+
+首先创建接口`AccountDao`，定义两个方法分别是`out`和`in`
+
+```java
+/**
+ * AccountDao
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+
+public interface AccountDao {
+
+    /**
+     * 转出
+     *
+     * @param from  转出账户
+     * @param money 转出金额
+     */
+    void out(String from, double money);
+
+    /**
+     * 转入
+     *
+     * @param to    转入账户
+     * @param money 转入金额
+     */
+    void in(String to, double money);
+}
+```
+
+接着创建实现类`AccountDaoImpl`实现`out`和`in`方法并且继承`JdbcSupport`类。这样就可以直接使用父类的`JDBCTemplate`对象。
+
+```java
+/**
+ * AccountDao实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
+
+    @Override
+    public void out(String from, double money) {
+        this.getJdbcTemplate().update("UPDATE account SET money = money - ? WHERE name = ?", money, from);
+    }
+
+    @Override
+    public void in(String to, double money) {
+        this.getJdbcTemplate().update("UPDATE account SET money = money + ? WHERE name = ?", money, to);
+    }
+}
+
+```
+
+然后创建接口`AccountrService`，定义`transfer`方法
+
+```java
+/**
+ * AccountService
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public interface AccountService {
+
+    /**
+     * 转账
+     * @param from 转出账户
+     * @param to 转入账户
+     * @param money 交易金额
+     */
+    void transfer(String from, String to, Double money);
+}
+
+```
+
+再创建类`AccountServiceImpl`实现该接口，并声明`AccountDao`引用并创建`set`方法
+
+```java
+/**
+ * AccountService实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public class AccountServiceImpl implements AccountService {
+
+    private AccountDao accountDao;
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+    @Override
+    public void transfer(String from, String to, Double money) {
+        accountDao.out(from, money);
+        accountDao.in(to, money);
+    }
+}
+```
+
+最后创建配置文件`spring-tx-programmatic.xml`，用来管理Bean。
+
+引入数据库连接文件，配置数据源，创建Bean对象`accountDao`将数据源`dataSource`注入到`accountDao`中，再创建Bean对象`accountService`，将`accountDao`注入。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="                                             
+            http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://www.springframework.org/schema/context   
+            http://www.springframework.org/schema/context/spring-context.xsd  
+            http://www.springframework.org/schema/tx 
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 编程式事务管理配置文件 -->
+
+    <!-- 配置Service -->
+    <bean id="accountService" class="learningspring.transaction.programmatic.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"/>
+    </bean>
+
+    <!-- 配置Dao -->
+    <bean id="accountDao" class="learningspring.transaction.programmatic.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 引入数据库配置文件 -->
+    <context:property-placeholder location="db.properties"/>
+
+    <!-- 配置C3P0连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+</beans>
+```
+
+到此一个转账模拟业务就实现了，数据库表依然使用前面创建的`account`表，先查询当前数据库的数据。
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321124514.png)
+
+编写测试方法，实现让姓名为Bob的账户向Jack转账1000元。
+
+```java
+/**
+ * 编程式事务测试类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(value = "classpath:spring-tx-programmatic.xml")
+public class AppTest {
+
+    @Resource(name = "accountService")
+    private AccountService accountService;
+
+    @Test
+    public void test(){
+        accountService.transfer("Bob","Jack",1000d);
+    }
+}
+```
+
+运行结果
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321124630.png)
+
+现在对类`AccountServiceImpl`里的`transfer`方法进行修改，让其发生异常，再观察结果
+
+```java
+/**
+ * AccountService实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public class AccountServiceImpl implements AccountService {
+
+    private AccountDao accountDao;
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+    @Override
+    public void transfer(String from, String to, Double money) {
+        accountDao.out(from, money);
+        // 抛出异常
+        int i = 1/0;
+        accountDao.in(to, money);
+    }
+
+}
+
+```
+
+查询数据库数据
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321125027.png)
+
+这时Bob账户的钱就少了1000元，而Jack账户也没有增加1000元。
+
+所以就需要事务来进行管理。
+
+### 编程式事务
+
+所谓编程式事务，就是要在源码中编写事务相关的代码。实现编程式事务，首先要在`AccountServiceImpl`中声明`TransactionTemplate`对象，并创建set方法。然后修改`transfer`参数列表所有参数都用`final`(因为使用了匿名内部类)修饰，并修改方法体内容。
+
+```java
+/**
+ * AccountService实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public class AccountServiceImpl implements AccountService {
+
+    private AccountDao accountDao;
+
+    private TransactionTemplate transactionTemplate;
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+    public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+        this.transactionTemplate = transactionTemplate;
+    }
+
+    @Override
+    public void transfer(final String from, final String to, final Double money) {
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                accountDao.out(from, money);
+                // 抛出异常
+                int i = 1/0;
+                accountDao.in(to,money);
+            }
+        });
+    }
+}
+```
+
+然后修改`spring-tx-programmatic.xml`文件，创建Bean对象`transactionManager`和`transactionTemplate`，并将`transactionTemplate`注入到`accountService`中。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="                                             
+            http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://www.springframework.org/schema/context   
+            http://www.springframework.org/schema/context/spring-context.xsd  
+            http://www.springframework.org/schema/tx 
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 编程式事务管理配置文件 -->
+
+    <!-- 配置Service -->
+    <bean id="accountService" class="learningspring.transaction.programmatic.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"/>
+        <property name="transactionTemplate" ref="transactionTemplate"/>
+    </bean>
+
+    <!-- 配置Dao -->
+    <bean id="accountDao" class="learningspring.transaction.programmatic.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 引入数据库配置文件 -->
+    <context:property-placeholder location="db.properties"/>
+
+    <!-- 配置C3P0连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 配置模板 -->
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+</beans>
+```
+
+此时异常依然存在，数据库数据仍然是上次执行的结果状态
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321125027.png)
+
+再次运行测试方法，并查询结果，观察是否发生变化
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321130039.png)
+
+现在就实现了编程式事务，当出现异常时，数据库的数据就不会被修改。
+
+### 声明式事务
+
+#### XML配置方式
+
+声明式事务即通过配置文件实现，利用的就是Spring的AOP
+
+修改类`AccountServiceImpl`，删除`TransactionTemplate`对象，并修改`transfer`方法，保留异常代码
+
+```java
+/**
+ * AccountService实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+public class AccountServiceImpl implements AccountService{
+
+    private AccountDao accountDao;
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+    @Override
+    public void transfer(String from, String to, Double money) {
+        accountDao.out(from, money);
+        int i = 1/0;
+        accountDao.in(to,money);
+
+    }
+}
+```
+
+然后创建配置文件`spring-tx-declarative.xml`，配置数据源即Bean对象，然后配置事务管理器。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 声明式事务管理配置文件 -->
+
+    <!-- 配置Service -->
+    <bean id="accountService" class="learningspring.transaction.declarative.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"/>
+    </bean>
+
+    <!-- 配置Dao -->
+    <bean id="accountDao" class="learningspring.transaction.declarative.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 引入数据库配置文件 -->
+    <context:property-placeholder location="db.properties"/>
+
+    <!-- 配置C3P0连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>
+```
+
+接着就配置事务的增强，配置文件中加入以下配置
+
+```xml
+<!-- 配置事务的增强 -->
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <!-- 配置事务的规则 根据实际业务修改-->
+        <tx:method name="*" propagation="REQUIRED"/>
+    </tx:attributes>
+</tx:advice>
+
+<!-- AOP的配置 -->
+<aop:config>
+    <aop:pointcut id="pointcut1" expression="execution(* learningspring.transaction.declarative.AccountServiceImpl.*(..))"/>
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut1"/>
+</aop:config>
+```
+
+先查看当前数据库数据
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321130039.png)
+
+编写测试方法
+
+```java
+/**
+ * 声明式事务配置测试类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(value = "classpath:spring-tx-declarative.xml")
+public class AppTest {
+
+    @Resource(name = "accountService")
+    private AccountService accountService;
+
+    @Test
+    public void test(){
+        accountService.transfer("Bob","Jack",1000d);
+    }
+}
+```
+
+运行查看结果，是否变化
+
+![](https://blogpictrue-1251547651.cos.ap-chengdu.myqcloud.com/blog/20190321132512.png)
+
+至此就实现了声明式事务XML方式的配置。
+
+#### 注解配置方式
+
+Spring的事务配置仍然支持注解配置
+
+继续沿用`spring-tx-declarative.xml`文件，把事务增强和AOP相关的配置注释，并开启注解事务。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd">
 
 
+    <!-- 声明式事务管理配置文件 -->
+
+    <!-- 配置Service -->
+    <bean id="accountService" class="learningspring.transaction.declarative.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"/>
+    </bean>
+
+    <!-- 配置Dao -->
+    <bean id="accountDao" class="learningspring.transaction.declarative.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 引入数据库配置文件 -->
+    <context:property-placeholder location="db.properties"/>
+
+    <!-- 配置C3P0连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <!-- 配置事务的增强 -->
+    <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+        <!--<tx:attributes>-->
+            <!-- 配置事务的规则 -->
+            <!--<tx:method name="*" propagation="REQUIRED"/>-->
+        <!--</tx:attributes>-->
+    <!--</tx:advice>-->
+
+    <!-- AOP的配置 -->
+    <!--<aop:config>-->
+        <!--<aop:pointcut id="pointcut1" expression="execution(* learningspring.transaction.declarative.AccountServiceImpl.*(..))"/>-->
+        <!--<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut1"/>-->
+    <!--</aop:config>-->
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
+```
+
+接下来就可以在业务层类上使用事务管理的注解了。修改`AccountServiceImpl`类，添加`@Transactional`注解
+
+```java
+/**
+ * AccountService实现类
+ *
+ * @author Chen Rui
+ * @version 1.0
+ **/
+@Transactional(rollbackFor = Exception.class)
+public class AccountServiceImpl implements AccountService{
+
+    private AccountDao accountDao;
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+
+    @Override
+    public void transfer(String from, String to, Double money) {
+        accountDao.out(from, money);
+        int i = 1/0;
+        accountDao.in(to,money);
+
+    }
+}
+```
+
+再次运行测试方法，数据库也不会发生改变。
