@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--构造方法方式的属性注入-->
+    <bean id="car" class="learningspring.ioc.xml.demo4.Car">
+        <constructor-arg name="name" value="BWM"/>
+        <constructor-arg name="price" value="800000"/>
+    </bean>
+
+    <!--Set方法方式的属性注入-->
+    <bean id="dog" class="learningspring.ioc.xml.demo4.Dog">
+        <property name="name" value="Golden"/>
+        <property name="length" value="100"/>
+    </bean>
+
+    <!--为Bean注入对象属性-->
+    <bean id="employee" class="learningspring.ioc.xml.demo4.Employee" p:cat-ref="cat">
+        <property name="name" value="Chen"/>
+        <property name="car" ref="car"/>
+        <property name="dog" ref="dog"/>
+    </bean>
+
+    <!--P名称空间的属性注入-->
+    <bean id="cat" class="learningspring.ioc.xml.demo4.Cat" p:name="Orange" p:length="100"/>
+
+    <!--SpEL表达式注入-->
+    <bean id="cat2" class="learningspring.ioc.xml.demo4.Cat">
+        <property name="name" value="#{'Orange'}"/>
+        <property name="length" value="#{101}"/>
+    </bean>
+</beans>

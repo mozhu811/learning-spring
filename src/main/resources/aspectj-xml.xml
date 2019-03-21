@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 配置目标对象，即被增强的对象 -->
+    <bean id="productDao" class="learningspring.aop.aspectj.xml.demo2.ProductDaoImpl"/>
+
+    <!-- 将增强类(切面类)交给Spring管理 -->
+    <bean id="productEnhancer" class="learningspring.aop.aspectj.xml.demo2.ProductEnhancer"/>
+    
+    <!-- 通过对AOP的配置完成对目标对象产生代理 -->
+    <aop:config>
+        <!-- 表达式配置哪些类的哪些方法需要进行增强 -->
+        <!-- 对ProductDaoImpl类中的save方法进行增强 -->
+        <!--
+        “*” 表示任意返回值类型
+        “..” 表示任意参数
+        -->
+        <!-- 前置增强的切入点配置 -->
+        <aop:pointcut id="pointcut1" expression="execution(* learningspring.aop.aspectj.xml.demo2.ProductDaoImpl.save(..))"/>
+
+        <!-- 后置增强的切入点配置 -->
+        <aop:pointcut id="pointcut2" expression="execution(* learningspring.aop.aspectj.xml.demo2.ProductDaoImpl.delete(..))"/>
+
+        <!-- 环绕增强的切入点配置 -->
+        <aop:pointcut id="pointcut3" expression="execution(* learningspring.aop.aspectj.xml.demo2.ProductDaoImpl.modify(..))"/>
+
+        <!-- 异常抛出增强的切入点配置 -->
+        <aop:pointcut id="pointcut4" expression="execution(* learningspring.aop.aspectj.xml.demo2.ProductDaoImpl.query(..))"/>
+
+        <!-- 配置切面 -->
+        <aop:aspect ref="productEnhancer">
+            <!-- 前置增强 -->
+            <!-- 实现在调用save方法之前调用checkPri方法来进行权限校验-->
+            <aop:before method="checkPri" pointcut-ref="pointcut1"/>
+
+            <!-- 后置增强 -->
+            <!-- returning里面的值必须和writeLog()方法里的参数名相同，本案例为result-->
+            <aop:after-returning method="writeLog" returning="result" pointcut-ref="pointcut2"/>
+
+            <!-- 环绕增强 -->
+            <aop:around method="monitor" pointcut-ref="pointcut3"/>
+
+            <!-- 异常抛出增强 -->
+            <aop:after-throwing method="exception" throwing="ex" pointcut-ref="pointcut4"/>
+
+            <!-- 最终增强 -->
+            <aop:after method="finallyAdvice" pointcut-ref="pointcut4"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

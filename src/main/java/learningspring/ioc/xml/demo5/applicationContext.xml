@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--Spring的集合属性的注入-->
+    <!--注入数组类型-->
+    <bean id="collectionBean" class="learningspring.ioc.xml.demo5.CollectionBean">
+        <!-- 注入数组类型 -->
+        <property name="strs">
+            <list>
+                <value>Tom</value>
+                <value>Jack</value>
+            </list>
+        </property>
+
+        <!-- 注入List集合 -->
+        <property name="list">
+            <list>
+                <value>Lucy</value>
+                <value>Lily</value>
+            </list>
+        </property>
+
+        <!-- 注入Set集合 -->
+        <property name="set">
+            <set>
+                <value>aaa</value>
+                <value>bbb</value>
+                <value>ccc</value>
+            </set>
+        </property>
+
+        <!-- 注入Map集合 -->
+        <property name="map">
+            <map>
+                <entry key="a" value="1"/>
+                <entry key="b" value="2"/>
+            </map>
+        </property>
+    </bean>
+</beans>

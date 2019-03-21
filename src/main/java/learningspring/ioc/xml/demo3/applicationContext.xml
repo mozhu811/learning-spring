@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Spring Bean的实例化方式-->
+
+    <!-- 无参构造的方式 -->
+    <bean id="dog" class="learningspring.ioc.xml.demo3.Dog"/>
+
+    <!-- 静态工厂的方式 -->
+    <bean id="car" class="learningspring.ioc.xml.demo3.CarFactory" factory-method="createCar"/>
+
+    <!-- 实例工厂的方式 -->
+    <bean id="dogFactory" class="learningspring.ioc.xml.demo3.DogFactory"/>
+    <bean id="dog2" factory-bean="dogFactory" factory-method="createDog"/>
+</beans>

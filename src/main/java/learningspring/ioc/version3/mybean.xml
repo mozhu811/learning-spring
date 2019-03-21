@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="user" class="learningspring.ioc.version3.User">
+        <property name="name" value="Chen"/>
+        <property name="major" value="SoftEngineering"/>
+    </bean>
+</beans>

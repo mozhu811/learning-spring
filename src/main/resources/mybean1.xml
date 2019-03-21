@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 1.配置bean -->
+    <bean id="book" class="learningspring.aop.aspectj.xml.demo1.Book"/>
+    <bean id="bookEnhancer" class="learningspring.aop.aspectj.xml.demo1.BookEnhancer"/>
+    <!--切入点常用表达式-->
+    <!--模板-->
+    <!--execution(<访问修饰符>?<返回值类型><方法名>(<参数>)<异常>)-->
+    <!--本例子表达式即为
+     execution(* learningspring.aop.aspectj-xml.xml.MyBookok.*(..))
+     Book类中的所有方法都进行增强
+     -->
+
+    <!-- 2.配置aop操作 -->
+    <aop:config>
+        <!-- 2.1 配置切入点 -->
+        <!-- 切入点: 实际增强的方法就叫做切入点-->
+        <aop:pointcut id="point1" expression="execution(* learningspring.aop.aspectj.xml.demo1.Book.*(..))"/>
+        <aop:pointcut id="point2" expression="execution(* learningspring.aop.aspectj.xml.demo1.Book.delete(..))"/>
+        <!-- 2.2 配置切面 -->
+        <aop:aspect ref="bookEnhancer">
+            <!--
+            增强类型：
+            Before：在方法之前执行
+            After：在方法之后执行，无论成功与否
+            AfterThrowing：方法出现异常执行
+            AfterReturning：方法执行成功之后执行
+            Around：在方法之前和之后执行
+            -->
+            <aop:before method="before" pointcut-ref="point1"/>
+            <aop:after method="after" pointcut-ref="point1"/>
+            <aop:after-throwing method="afterThrowing" throwing="e" pointcut-ref="point1"/>
+            <aop:after-returning method="afterReturning" returning="id" pointcut-ref="point2"/>
+            <aop:around method="around" pointcut-ref="point1"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
